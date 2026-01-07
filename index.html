@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슈크림빵 장인 키우기</title>
+    <style>
+        /* 디자인: 달콤하고 부드러운 빵 느낌 */
+        body { 
+            text-align: center; font-family: 'Malgun Gothic', sans-serif; 
+            background-color: #fff9eb; margin: 0; padding: 20px; color: #5d4037;
+        }
+        .container { 
+            max-width: 450px; margin: auto; background: white; 
+            padding: 30px; border-radius: 40px; 
+            box-shadow: 0 15px 35px rgba(210, 105, 30, 0.2); 
+        }
+        
+        #score-label { font-size: 18px; margin-bottom: 5px; color: #8d6e63; }
+        #score { font-size: 45px; font-weight: bold; margin-bottom: 5px; color: #d2691e; }
+        #stats { font-size: 14px; margin-bottom: 20px; color: #a1887f; }
+
+        /* 슈크림빵 버튼 스타일 */
+        .bread-wrapper { margin: 30px 0; position: relative; }
+        #bread-btn {
+            width: 220px; cursor: pointer; transition: transform 0.05s;
+            user-select: none; -webkit-user-drag: none;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+        }
+        #bread-btn:active { transform: scale(0.92); }
+
+        /* 상점 스타일 */
+        .shop { background: #fff3e0; padding: 20px; border-radius: 20px; text-align: left; }
+        .shop h3 { margin-top: 0; color: #e65100; font-size: 18px; border-bottom: 2px solid #ffe0b2; padding-bottom: 5px; }
+        
+        .upgrade-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .upgrade-info { display: flex; flex-direction: column; }
+        .upgrade-name { font-weight: bold; font-size: 14px; }
+        .upgrade-desc { font-size: 12px; color: #8d6e63; }
+
+        button {
+            background: #ffa726; color: white; border: none;
+            padding: 10px 15px; border-radius: 12px; cursor: pointer; 
+            font-weight: bold; transition: 0.2s;
+        }
+        button:hover:not(:disabled) { background: #fb8c00; transform: translateY(-2px); }
+        button:disabled { background: #d7ccc8; cursor: not-allowed; }
+
+        .reset-btn { background: none; color: #bcaaa4; font-size: 12px; margin-top: 20px; text-decoration: underline; cursor: pointer; border: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="score-label">구워낸 슈크림빵</div>
+    <div id="score">0</div>
+    <div id="stats">클릭당 숙련도: +1.0 | 자동 생산: 0/초</div>
+
+    <div class="bread-wrapper">
+        <img id="bread-btn" src="https://cdn-icons-png.flaticon.com/512/3257/3257620.png" alt="슈크림빵">
+    </div>
+
+    <div class="shop">
+        <h3>주방 업그레이드</h3>
+        
+        <div class="upgrade-item">
+            <div class="upgrade-info">
+                <span class="upgrade-name">정교한 손놀림</span>
+                <span class="upgrade-desc">클릭 점수 +0.5</span>
+            </div>
+            <button onclick="buyClick()" id="btn-click">비용: 10</button>
+        </div>
+
+        <div class="upgrade-item">
+            <div class="upgrade-info">
+                <span class="upgrade-name">초보 제빵사 고용</span>
+                <span class="upgrade-desc">자동 생산 +1/초</span>
+            </div>
+            <button onclick="buyAuto()" id="btn-auto">비용: 50</button>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetGame()">처음부터 다시 시작하기</button>
+</div>
+
+<script>
+    // 변수 초기화 (숫자가 소수점으로 올라가므로 정밀하게 계산)
+    let breadCount = 0;
+    let clickPower = 1.0;
+    let autoPower = 0;
+    let clickCost = 10;
+    let autoCost = 50;
+
+    const scoreEl = document.getElementById('score');
+    const statsEl = document.getElementById('stats');
+    const btnClick = document.getElementById('btn-click');
+    const btnAuto = document.getElementById('btn-auto');
+
+    // 세이브 로드
+    function loadGame() {
+        const saved = localStorage.getItem('shucrimSave');
+        if (saved) {
+            const data = JSON.parse(saved);
+            breadCount = data.breadCount || 0;
+            clickPower = data.clickPower || 1.0;
+            autoPower = data.autoPower || 0;
+            clickCost = data.clickCost || 10;
+            autoCost = data.autoCost || 50;
+            updateUI();
+        }
+    }
+
+    function saveGame() {
+        const data = { breadCount, clickPower, autoPower, clickCost, autoCost };
+        localStorage.setItem('shucrimSave', JSON.stringify(data));
+    }
+
+    // UI 업데이트 (소수점 첫째자리까지 표시 가능하도록 함)
+    function updateUI() {
+        scoreEl.innerText = Math.floor(breadCount).toLocaleString();
+        statsEl.innerText = `클릭당 숙련도: +${clickPower.toFixed(1)} | 자동 생산: ${autoPower}/초`;
+        
+        btnClick.innerText = `비용: ${clickCost}`;
+        btnAuto.innerText = `비용: ${autoCost}`;
+        
+        btnClick.disabled = breadCount < clickCost;
+        btnAuto.disabled = breadCount < autoCost;
+    }
+
+    // 빵 클릭 이벤트
+    document.getElementById('bread-btn').onclick = (e) => {
+        breadCount += clickPower;
+        updateUI();
+        createParticle(e.clientX, e.clientY); // 클릭 효과 추가 가능(선택사항)
+    };
+
+    // 클릭 파워 강화 (0.5씩 증가)
+    function buyClick() {
+        if (breadCount >= clickCost) {
+            breadCount -= clickCost;
+            clickPower += 0.5; // 요청하신 대로 0.5 증가
+            clickCost = Math.floor(clickCost * 1.5);
+            updateUI();
+            saveGame();
+        }
+    }
+
+    // 자동 생산 구매
+    function buyAuto() {
+        if (breadCount >= autoCost) {
+            breadCount -= autoCost;
+            autoPower += 1;
+            autoCost = Math.floor(autoCost * 1.7);
+            updateUI();
+            saveGame();
+        }
+    }
+
+    // 자동 생산 (1초마다)
+    setInterval(() => {
+        if (autoPower > 0) {
+            breadCount += autoPower;
+            updateUI();
+            saveGame();
+        }
+    }, 1000);
+
+    function resetGame() {
+        if(confirm("모든 숙련도가 사라집니다. 다시 시작할까요?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    loadGame();
+    updateUI();
+</script>
+
+</body>
+</html>
