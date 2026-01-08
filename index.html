@@ -3,230 +3,722 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>슈크림빵 장인 키우기</title>
+    <title>슈크림빵 클리커 - 미스터리 룸</title>
     <style>
-        body { text-align: center; font-family: 'Malgun Gothic', sans-serif; background-color: #fdf6e3; margin: 0; padding: 20px; overflow: hidden; }
-        .container { 
-            max-width: 450px; margin: auto; background: white; 
-            padding: 25px; border-radius: 40px; border: 1px solid #eee; 
-            height: 750px; position: relative; display: flex; flex-direction: column; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05); overflow: hidden; 
+        /* --- [기본 설정] --- */
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            background-color: #FFF8E7; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            user-select: none;
+            overflow: hidden;
         }
 
-        /* 🔐 보안 게이트 */
-        #key-gate { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #2c3e50; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: opacity 0.5s; }
-        .key-box { width: 80%; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
-        #access-key { width: 90%; padding: 12px; margin-top: 15px; border: none; border-radius: 10px; text-align: center; font-size: 18px; }
-
-        /* 🎬 인트로 */
-        #intro-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #fff8e1; z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s; }
-        .intro-logo { width: 100px; height: 100px; object-fit: contain; }
-
-        /* 🎮 게임 메인 */
-        #game-content { display: none; flex-direction: column; height: 100%; position: relative; }
-        .nav-header { display: flex; align-items: center; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; margin-bottom: 10px; }
-        .circle-btn { width: 35px; height: 35px; background-color: #757575; border-radius: 50%; border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.3s; }
-        .circle-btn:hover { background-color: #212121; }
-
-        .page { display: none; flex-direction: column; flex-grow: 1; }
-        .page.active { display: flex; }
-
-        /* ✨ 스코어 및 정보 */
-        #score-container { height: 60px; display: flex; align-items: center; justify-content: center; }
-        #score { font-size: 50px; font-weight: bold; color: #d2691e; margin: 0; transition: transform 0.1s ease-in-out; }
-        .score-bump { transform: scale(1.15); }
-        .sub-info { font-size: 13px; color: #888; font-weight: bold; margin-bottom: 15px; }
-
-        /* 🥐 클릭 버튼 */
-        #bread-btn { width: 160px; height: 160px; object-fit: contain; cursor: pointer; transition: transform 0.05s cubic-bezier(0.1, 0.7, 1.0, 0.1); user-select: none; margin: 0 auto; z-index: 10; }
-        #bread-btn:active { transform: scale(0.90) rotate(-2deg); }
-
-        .feed-btn { 
-            background: linear-gradient(to bottom, #ff8a50, #ff7043);
-            color: white; border: none; padding: 12px 30px; 
-            border-radius: 50px; cursor: pointer; font-weight: bold; 
-            font-size: 15px; margin: 15px auto 5px auto;
-            box-shadow: 0 4px 15px rgba(255, 112, 67, 0.3);
-            transition: 0.2s;
+        .game-container {
+            width: 100%;
+            max-width: 400px;
+            height: 720px;
+            background-color: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 30px 24px;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .feed-btn:active { transform: scale(0.98) translateY(2px); }
 
-        /* 🛒 상점 영역 */
-        .shop-container { 
-            background: transparent; padding: 15px; 
-            border-radius: 25px; border: 2px dashed #ffe082; 
-            margin-top: 10px; margin-bottom: 70px; 
+        /* --- [모달 1] 전원 버튼 팝업 --- */
+        #modal-power {
+            display: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 400;
+            justify-content: center; align-items: center;
+            border-radius: 30px;
         }
-        .upgrade-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .upgrade-label { font-size: 14px; font-weight: bold; color: #5d4037; text-align: left; }
+
+        .power-box {
+            background-color: white;
+            width: 80%;
+            max-width: 300px;
+            padding: 30px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .power-title {
+            font-size: 18px; font-weight: bold; color: #000; margin-bottom: 5px;
+            display: flex; justify-content: center; align-items: center; gap: 5px;
+        }
+
+        .power-input {
+            width: 100%; padding: 12px; border: 1px solid #000; border-radius: 6px;
+            box-sizing: border-box; font-size: 14px; text-align: center; outline: none;
+        }
+        .power-input::placeholder { color: #aaa; }
+
+        .power-btn-group { display: flex; gap: 8px; width: 100%; }
+
+        .btn-p-confirm {
+            flex: 1; background-color: #333333; color: white; border: none;
+            padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;
+        }
+
+        .btn-p-cancel {
+            flex: 1; background-color: #EEEEEE; color: #333; border: none;
+            padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;
+        }
+        .btn-p-confirm:active, .btn-p-cancel:active { transform: scale(0.96); }
+
+
+        /* --- [모달 2] 터미널 (키 채굴) --- */
+        #modal-terminal {
+            display: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 300;
+            justify-content: center; align-items: center;
+            border-radius: 30px;
+        }
+
+        .terminal-window {
+            width: 90%; height: 65%;
+            background-color: #333; color: #CCC;
+            border-radius: 25px; padding: 40px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; font-weight: bold; gap: 40px; box-sizing: border-box;
+        }
+        .terminal-text { font-size: 22px; color: #EEE; margin-bottom: 10px; }
+        .term-btn-continue {
+            background-color: #fff; color: #333; border: none; padding: 15px 40px;
+            border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 16px;
+            transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .term-btn-continue:hover { background-color: #ddd; }
+        .progress-container {
+            width: 100%; height: 20px; background-color: #555;
+            border-radius: 15px; overflow: hidden; display: none; position: relative;
+        }
+        .progress-fill { height: 100%; width: 0%; background-color: #2ECC71; border-radius: 15px; transition: width 0.1s linear; }
+        .progress-text { font-size: 16px; color: #aaa; margin-top: -20px; display: none; }
+        .key-display { display: none; flex-direction: column; gap: 20px; width: 100%; align-items: center; }
+        .found-key {
+            font-size: 18px; color: #2ECC71; background: #222; padding: 20px;
+            border-radius: 12px; width: 95%; word-break: break-all; letter-spacing: 0.5px; line-height: 1.4;
+        }
+        .btn-use-key {
+            background-color: #2ECC71; color: white; border: none; padding: 12px 30px;
+            border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+
+        /* --- [화면 1] 엑세스 키 입력 --- */
+        #view-access {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background-color: #2C3E50; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 200; border-radius: 30px;
+        }
+
+        .access-box {
+            background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px 30px; border-radius: 20px; width: 80%; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .access-title { color: white; font-size: 20px; font-weight: bold; margin-bottom: 5px; letter-spacing: 1px; }
+        .access-input {
+            width: 100%; padding: 12px; border-radius: 12px; border: none;
+            box-sizing: border-box; font-size: 14px; text-align: center; letter-spacing: 1px;
+            background-color: rgba(255,255,255,0.9);
+        }
+        .access-input:focus { outline: 3px solid #3498DB; }
+        .access-btn {
+            width: 100%; padding: 12px; background-color: #3498DB; color: white;
+            border: none; border-radius: 12px; font-size: 15px; font-weight: bold;
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .access-btn:active { transform: scale(0.96); }
+        .get-key-btn {
+            width: 100%; padding: 12px; background-color: #2ECC71; color: white;
+            border: none; border-radius: 12px; font-size: 15px; font-weight: bold;
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .get-key-btn:active { transform: scale(0.96); }
+        .error-msg { color: #E74C3C; font-size: 13px; height: 15px; font-weight: bold; }
+
+        /* --- [화면 2] 시작 화면 --- */
+        #view-start {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100%; background-color: #FFF9E6; position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%; z-index: 100; border-radius: 30px;
+        }
+        .intro-logo { width: 120px; margin-bottom: 20px; }
+        .intro-text { color: #D35400; font-size: 16px; font-weight: bold; margin-bottom: 30px; }
+        .start-btn {
+            background-color: #FFA500; color: white; border: none; padding: 12px 40px;
+            border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(255, 165, 0, 0.3); transition: transform 0.1s;
+        }
+        .start-btn:active { transform: scale(0.95); }
+
+        /* --- [화면 3] 게임 화면 --- */
+        #view-game { display: none; flex-direction: column; gap: 20px; height: 100%; }
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            color: #555; font-weight: bold; font-size: 16px; padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0; min-height: 40px;
+        }
+        .header-left { display: flex; align-items: center; }
+        .nav-btn {
+            background: #999; color: white; width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin-right: 12px;
+            font-size: 14px; cursor: pointer; transition: background 0.2s;
+        }
+        .nav-btn:hover { background: #777; }
+        .power-btn-top {
+            background: #bbb; color: white; width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer;
+        }
         
-        button.buy { 
-            background: #ffa000; color: white; border: none; 
-            padding: 8px 15px; border-radius: 12px; 
-            cursor: pointer; font-weight: bold; min-width: 80px;
-            box-shadow: 0 4px 0 #e68a00;
-            transition: all 0.1s;
+        .score-board { text-align: center; margin-top: 10px; }
+        .score { font-size: 72px; font-weight: bold; color: #E67E22; margin: 0; line-height: 1; }
+        .stats-text { color: #888; font-size: 13px; margin-top: 8px; font-weight: 500; }
+        
+        .main-area { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .bread-img { width: 180px; cursor: pointer; transition: transform 0.05s; margin-bottom: 5px; }
+        .bread-img:active { transform: scale(0.95); }
+        
+        .yeeun-msg-area {
+            height: 20px; font-size: 14px; font-weight: bold; color: #8E44AD;
+            display: flex; align-items: center; justify-content: center; width: 100%;
         }
-        button.buy:active { transform: translateY(3px); box-shadow: 0 1px 0 #e68a00; }
-        button.buy:disabled { background: #e0e0e0; color: #999; box-shadow: none; cursor: not-allowed; transform: none; }
+        .action-btn {
+            background: linear-gradient(to right, #FF8C42, #FF7F50); color: white; border: none;
+            padding: 14px 0; width: 100%; border-radius: 50px; font-size: 16px; font-weight: bold;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(255, 127, 80, 0.3);
+        }
+        .action-btn:active { transform: translateY(2px); }
+        .message-area { height: 20px; font-size: 14px; font-weight: bold; color: #E74C3C; text-align: center; margin-top: 5px;}
 
-        #admin-trigger { position: absolute; bottom: 15px; right: 15px; width: 35px; height: 35px; background: #757575; color: white; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; transition: 0.3s; }
-        #admin-trigger:hover { background: #212121; }
+        .upgrade-box {
+            border: 2px dashed #FCD34D; border-radius: 20px; padding: 20px; background-color: #fffff8;
+            display: flex; flex-direction: column; gap: 12px; margin-top: auto;
+        }
+        .upgrade-item { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold; color: #444; }
+        .cost-badge {
+            background-color: #E0E0E0; color: #999; padding: 8px 16px; border-radius: 12px;
+            font-size: 12px; cursor: not-allowed; transition: all 0.3s; min-width: 60px; text-align: center;
+        }
+        .cost-badge.active { background-color: #FF8C42; color: white; cursor: pointer; }
 
-        .floating-text { position: absolute; color: #d2691e; font-weight: bold; font-size: 24px; pointer-events: none; animation: float-up 0.6s ease-out forwards; z-index: 1000; }
-        @keyframes float-up { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-80px) scale(1.2); opacity: 0; } }
+        /* --- [화면 4] 통계 화면 --- */
+        #view-stats { display: none; flex-direction: column; gap: 20px; height: 100%; }
+        .stats-box {
+            background-color: #FFF9E6; border: 1px solid #FFE082; border-radius: 20px;
+            padding: 24px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .stats-title { font-size: 18px; font-weight: bold; color: #555; padding-bottom: 10px; border-bottom: 2px solid #FFD54F; margin-bottom: 5px; }
+        .stats-row { display: flex; flex-direction: column; gap: 5px; font-size: 15px; color: #333; }
+        .stats-value { font-weight: bold; font-size: 16px; }
+        .special-stat { color: #8E44AD; font-weight: bold; margin-top: 10px; }
+        .yama-stat { color: #FF0000; font-weight: bold; margin-top: 5px; }
+        .full-yama-stat { color: #8B0000; font-weight: bold; margin-top: 5px; }
 
-        .modal-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 6000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 25px; border-radius: 25px; width: 80%; }
+        .btn-hidden-page {
+            width: 100%; padding: 14px; background-color: #9B59B6; color: white;
+            border: none; border-radius: 15px; font-size: 15px; font-weight: bold;
+            cursor: pointer; margin-top: 20px; transition: transform 0.1s;
+        }
+        .btn-hidden-page:active { transform: scale(0.96); }
+
+        /* --- [NEW] 화면 5: 숨겨진 페이지 (마술사의 방) --- */
+        #view-hidden { 
+            display: none; 
+            flex-direction: column; 
+            justify-content: space-between; /* 상단 헤더, 중단 마술사, 하단 버튼 분배 */
+            height: 100%; 
+            /* 은은한 보라색 조명이 들어오는 어두운 공간 배경 */
+            background: radial-gradient(circle at center, #4a148c 0%, #1a0033 60%, #000000 100%);
+            border-radius: 30px;
+            padding: 30px 24px;
+            box-sizing: border-box;
+            color: white;
+            position: relative;
+        }
+        
+        /* 어두운 테마용 헤더 */
+        #view-hidden .header {
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            color: #D1C4E9;
+        }
+        #view-hidden .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        /* 마술사 영역 */
+        .magician-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .magician-img {
+            width: 220px;
+            /* 신비로운 보라색 그림자 효과 */
+            filter: drop-shadow(0 0 20px rgba(155, 89, 182, 0.6));
+            animation: floatMagician 3s ease-in-out infinite;
+        }
+        .magician-msg {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #E1BEE7;
+            text-align: center;
+            font-style: italic;
+            min-height: 24px;
+        }
+
+        /* 하단 미스터리 버튼 */
+        .mystery-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #8E44AD, #673AB7);
+            color: white;
+            border: 1px solid #9B59B6;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        .mystery-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 5px rgba(138, 43, 226, 0.8);
+        }
+
+        /* 애니메이션 */
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideUpFade { to { opacity: 0; transform: translateY(-50px); visibility: hidden; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes blinkPurple { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+        /* 마술사 둥둥 떠다니는 효과 */
+        @keyframes floatMagician { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="key-gate">
-        <div class="key-box">
-            <h2>ACCESS KEY</h2>
-            <input type="password" id="access-key" placeholder="••••••••">
-            <button onclick="verifyKey()" style="width:100%; padding:12px; margin-top:20px; background:#3498db; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">접속 승인</button>
-        </div>
-    </div>
-
-    <div id="intro-screen">
-        <img class="intro-logo" src="https://cdn-icons-png.flaticon.com/512/992/992747.png">
-        <p style="font-weight:bold; color:#d2691e; font-size: 18px; margin-top:15px;">장인의 길에 오신 것을 환영합니다.</p>
-        <button onclick="startGame()" style="margin-top:20px; padding:15px 45px; background:#ffa000; color:white; border:none; border-radius:50px; font-weight:bold; cursor:pointer;">게임 시작</button>
-    </div>
-
-    <div id="game-content">
-        <div class="nav-header">
-            <button class="circle-btn" onclick="togglePage()" id="nav-btn"> > </button>
-            <div id="page-title" style="font-weight:bold; color:#5d4037; font-size: 18px;">1 슈크림빵: 장인 🥐</div>
-        </div>
-
-        <div id="page-game" class="page active">
-            <div id="score-container"><div id="score">0</div></div>
-            <div class="sub-info">숙련도: <span id="info-power">1.0</span> / 자동: <span id="info-auto">0</span>/초</div>
-            
-            <img id="bread-btn" src="https://cdn-icons-png.flaticon.com/512/992/992747.png" alt="슈크림빵">
-            
-            <button class="feed-btn" onclick="tryFeed()">😋 승민이한테 <span id="feed-n-display">1</span>개씩 먹이기</button>
-            <div id="feed-message" style="color:#e74c3c; font-weight:bold; height:20px; font-size:13px; margin-top:5px;"></div>
-            
-            <div class="shop-container">
-                <div class="upgrade-row">
-                    <div class="upgrade-label">손놀림 강화 (+0.5)</div>
-                    <button class="buy" onclick="buyClick()" id="btn-click">5 🥐</button>
-                </div>
-                <div class="upgrade-row">
-                    <div class="upgrade-label">제빵기 설치 (+<span id="next-auto-val">2</span>)</div>
-                    <button class="buy" onclick="buyAuto()" id="btn-auto">30 🥐</button>
-                </div>
-                <div class="upgrade-row">
-                    <div class="upgrade-label">먹이기 강화 (+1)</div>
-                    <button class="buy" onclick="buyFeedUpgrade()" id="btn-feed-up">100 🥐</button>
+    <div class="game-container">
+        
+        <div id="modal-power">
+            <div class="power-box">
+                <div class="power-title">🔒 보안 코드 인증</div>
+                <input type="password" class="power-input" id="power-input-code" placeholder="코드를 입력하세요">
+                <div class="power-btn-group">
+                    <button class="btn-p-confirm" id="btn-power-confirm">확인</button>
+                    <button class="btn-p-cancel" id="btn-power-cancel">취소</button>
                 </div>
             </div>
         </div>
 
-        <div id="page-stats" class="page">
-            <div style="text-align:left; padding:25px; background:#fff8e1; border-radius:25px; border: 1px solid #ffd54f;">
-                <h3 style="margin-top:0; color:#5d4037; border-bottom: 2px solid #ffd54f; padding-bottom: 10px;">📊 실시간 통계</h3>
-                <p>총 클릭 횟수: <span id="st-clicks" style="font-weight:bold; color: #d2691e;">0</span>회</p>
-                <p>승민이가 먹은 빵: <span id="st-fed" style="font-weight:bold; color: #d2691e;">0</span>개</p>
-                <p style="color:#8e44ad; font-weight:bold; margin-top:20px;">예은이가 어이없게 본 횟수: <span id="st-yeeun">0</span>회</p>
+        <div id="modal-terminal">
+            <div class="terminal-window">
+                <div class="terminal-text" id="term-msg">키를 채굴 하겠습니까?</div>
+                <button class="term-btn-continue" id="btn-term-continue">Continue</button>
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">0%</div>
+                <div class="key-display" id="key-display-area">
+                    <div>ACCESS KEY:</div>
+                    <div class="found-key" id="found-key-text"></div>
+                    <button class="btn-use-key" id="btn-use-key">입력하고 닫기</button>
+                </div>
             </div>
         </div>
 
-        <button id="admin-trigger" onclick="openAdmin()">⏻</button>
+        <div id="view-access">
+            <div class="access-box">
+                <div class="access-title">ACCESS KEY</div>
+                <input type="password" class="access-input" id="input-access-key" placeholder="키를 입력하세요">
+                <button class="access-btn" id="btn-submit-key">접속 승인</button>
+                <button class="get-key-btn" id="btn-open-terminal">키 얻기</button>
+                <div class="error-msg" id="access-error-msg"></div>
+            </div>
+        </div>
+
+        <div id="view-start">
+            <img src="https://cdn-icons-png.flaticon.com/512/3081/3081840.png" alt="로고" class="intro-logo">
+            <div class="intro-text">장인의 길에 오신 것을 환영합니다.</div>
+            <button class="start-btn" id="btn-start">게임 시작</button>
+        </div>
+
+        <div id="view-game">
+            <div class="header">
+                <div class="header-left">
+                    <div class="nav-btn" id="btn-go-stats">&gt;</div>
+                    <span>1 슈크림빵: 장인 🥐</span>
+                </div>
+                <div class="power-btn-top" id="btn-power-game">⏻</div>
+            </div>
+            <div class="score-board">
+                <div class="score" id="score">0</div>
+                <div class="stats-text" id="stats-text">숙련도: 1.0 / 자동: 0/초</div>
+            </div>
+            <div class="main-area">
+                <img src="https://cdn-icons-png.flaticon.com/512/3081/3081840.png" alt="빵 바구니" class="bread-img" id="click-target">
+                <div class="yeeun-msg-area" id="yeeun-msg-area"></div>
+                <button class="action-btn" id="feed-btn">😋 승민이한테 1개씩 먹이기</button>
+                <div class="message-area" id="msg-box"></div>
+            </div>
+            <div class="upgrade-box">
+                <div class="upgrade-item"><span>손놀림 강화 (+0.5)</span><div class="cost-badge" id="btn-upgrade-1">3 🥐</div></div>
+                <div class="upgrade-item"><span>제빵기 설치 (+2/초)</span><div class="cost-badge" id="btn-upgrade-2">20 🥐</div></div>
+                <div class="upgrade-item"><span id="upgrade-3-title">먹이기 강화 (+1)</span><div class="cost-badge" id="btn-upgrade-3">50 🥐</div></div>
+            </div>
+        </div>
+
+        <div id="view-stats">
+            <div class="header">
+                <div class="header-left"><div class="nav-btn" id="btn-go-game">&lt;</div><span>2 데이터 통계 📊</span></div>
+                <div class="power-btn-top" id="btn-power-stats">⏻</div>
+            </div>
+            <div class="stats-box">
+                <div class="stats-title">📊 실시간 통계</div>
+                <div class="stats-row"><span class="stats-label">총 클릭 횟수:</span><span class="stats-value"><span id="stat-total-clicks">0</span>회</span></div>
+                <div class="stats-row"><span class="stats-label">승민이가 먹은 빵:</span><span class="stats-value"><span id="stat-total-fed">0</span>개</span></div>
+                <div class="stats-row special-stat"><span>예은이가 어이없게 본 횟수: <span id="stat-yeeun">0</span>회</span></div>
+                <div class="stats-row yama-stat"><span>예은이가 야마 돈 횟수: <span id="stat-yama">0</span>회</span></div>
+                <div class="stats-row full-yama-stat"><span>예은이가 풀야마 돈 횟수: <span id="stat-full-yama">0</span>회</span></div>
+                
+                <button class="btn-hidden-page" id="btn-go-hidden">💜 숨겨진 페이지로 이동</button>
+            </div>
+        </div>
+
+        <div id="view-hidden">
+            <div class="header">
+                <div class="header-left"><div class="nav-btn" id="btn-back-hidden">&lt;</div><span>The Void</span></div>
+            </div>
+            <div class="magician-area">
+                <img src="https://cdn-icons-png.flaticon.com/512/3081/3081307.png" alt="마술사" class="magician-img">
+                <div class="magician-msg" id="magician-text">"원하는 게 무엇인가?"</div>
+            </div>
+            <button class="mystery-btn" id="btn-mystery">🔮 운명의 카드 뽑기</button>
+        </div>
+
     </div>
 
-    <div id="robot-modal" class="modal-overlay"><div class="modal-content"><h3>🤖 보안 확인</h3><p>당신은 로봇인가요?</p><div style="display:flex; gap:10px; margin-top:20px;"><button style="flex:1; background:#ff7043; color:white; padding:12px; border:none; border-radius:12px; font-weight:bold;" onclick="isRobot(true)">네</button><button style="flex:1; background:#2ecc71; color:white; padding:12px; border:none; border-radius:12px; font-weight:bold;" onclick="isRobot(false)">아니요</button></div></div></div>
-    <div id="admin-modal" class="modal-overlay"><div class="modal-content"><h3>🔒 보안 코드 인증</h3><input type="password" id="admin-input" placeholder="코드를 입력하세요" style="width:90%; padding:12px; border-radius:10px; border:1px solid #ddd; text-align:center;"><div style="margin-top:20px; display:flex; gap:10px;"><button onclick="checkAdminCode()" style="flex:1; background:#333; color:white; padding:12px; border:none; border-radius:12px; font-weight:bold;">확인</button><button onclick="closeAdmin()" style="flex:1; background:#eee; padding:12px; border:none; border-radius:12px; font-weight:bold; color:#666;">취소</button></div></div></div>
-</div>
+    <script>
+        // --- 1. 키 및 코드 설정 ---
+        const ACCESS_KEY_ENTRY = "B7x9-Kq2P-vR5m-Zt4W"; 
+        const CHEAT_YEON = "SeungMinLoveYeon";        
+        const CHEAT_BREAD = "SeungMinLoveCreamBread"; 
 
-<script>
-    const ENCODED_KEY = "Qjd4OS1LcTJQLXZSNW0tWnQ0Vw=="; 
-    let breadCount = 0, clickPower = 1.0, autoPower = 0, clickCost = 5, autoCost = 30;
-    let autoLevel = 2; // 초기 자동 생산 증가치를 2로 상향
-    let feedAmount = 1, feedUpgradeCost = 100;
-    let totalClicks = 0, totalFed = 0, bonusYeeun = 0, isStatsPage = false, isHuman = false;
-    let usedCodes = [];
+        const viewAccess = document.getElementById('view-access');
+        const inputKey = document.getElementById('input-access-key');
+        const btnSubmitKey = document.getElementById('btn-submit-key');
+        const errorMsg = document.getElementById('access-error-msg');
 
-    function verifyKey() { if (btoa(document.getElementById('access-key').value) === ENCODED_KEY) { document.getElementById('key-gate').style.opacity = "0"; setTimeout(() => { document.getElementById('key-gate').style.display = "none"; document.getElementById('intro-screen').style.display = "flex"; setTimeout(() => document.getElementById('intro-screen').style.opacity = "1", 50); }, 500); } else alert("인증 실패"); }
-    function startGame() { document.getElementById('intro-screen').style.opacity = "0"; setTimeout(() => { document.getElementById('intro-screen').style.display = "none"; document.getElementById('game-content').style.display = "flex"; updateUI(); }, 500); }
-    function togglePage() { isStatsPage = !isStatsPage; document.getElementById('page-game').style.display = isStatsPage ? 'none' : 'flex'; document.getElementById('page-stats').style.display = isStatsPage ? 'flex' : 'none'; document.getElementById('page-title').innerText = isStatsPage ? "2 데이터 통계 📊" : "1 슈크림빵: 장인 🥐"; document.getElementById('nav-btn').innerText = isStatsPage ? "<" : ">"; }
+        // 터미널 관련
+        const btnOpenTerminal = document.getElementById('btn-open-terminal');
+        const modalTerminal = document.getElementById('modal-terminal');
+        const termMsg = document.getElementById('term-msg');
+        const btnTermContinue = document.getElementById('btn-term-continue');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const keyDisplayArea = document.getElementById('key-display-area');
+        const foundKeyText = document.getElementById('found-key-text');
+        const btnUseKey = document.getElementById('btn-use-key');
 
-    document.getElementById('bread-btn').onclick = (e) => {
-        breadCount += clickPower; totalClicks++;
-        const text = document.createElement('div');
-        text.className = 'floating-text';
-        text.innerText = `+${clickPower.toFixed(1)}`;
-        text.style.left = `${e.clientX - 20}px`; text.style.top = `${e.clientY - 40}px`;
-        document.body.appendChild(text);
-        setTimeout(() => text.remove(), 600);
-        updateUI();
-    };
+        // 전원 버튼 팝업 관련
+        const modalPower = document.getElementById('modal-power');
+        const btnPowerGame = document.getElementById('btn-power-game');
+        const btnPowerStats = document.getElementById('btn-power-stats');
+        const btnPowerConfirm = document.getElementById('btn-power-confirm');
+        const btnPowerCancel = document.getElementById('btn-power-cancel');
+        const powerInput = document.getElementById('power-input-code');
 
-    function tryFeed() { if (!isHuman) document.getElementById('robot-modal').style.display = 'flex'; else doFeed(); }
-    function isRobot(b) { if(b) alert("로봇 금지!"); else { isHuman = true; document.getElementById('robot-modal').style.display = 'none'; doFeed(); } }
-    function doFeed() {
-        if (breadCount >= feedAmount) {
-            breadCount -= feedAmount; totalFed += feedAmount;
-            const msg = document.getElementById('feed-message');
-            msg.innerText = (Math.floor(totalFed / 10) > Math.floor((totalFed - feedAmount) / 10)) ? "예은이가 어이없게 쳐다봅니다! (-_-)" : "승민이가 빵을 맛있게 먹었습니다!";
-            setTimeout(() => msg.innerText = "", 2000);
-            updateUI();
-        } else alert("슈크림빵이 부족합니다!");
-    }
+        let usedCheats = { yeon: false, bread: false };
 
-    function buyClick() { if (breadCount >= clickCost) { breadCount -= clickCost; clickPower += 0.5; clickCost = Math.floor(clickCost * 1.3); updateUI(); } }
-    
-    // ✨ 제빵기 강화 로직 수정: 2개씩 오르도록 변경
-    function buyAuto() { 
-        if (breadCount >= autoCost) { 
-            breadCount -= autoCost; 
-            autoPower += autoLevel; // 현재 레벨만큼 생산량 증가
-            autoLevel += 2;         // 다음 레벨은 2가 더 커짐 (2->4->6...)
-            autoCost = Math.floor(autoCost * 1.5); 
-            updateUI(); 
-        } 
-    }
-    
-    function buyFeedUpgrade() { if (breadCount >= feedUpgradeCost) { breadCount -= feedUpgradeCost; feedAmount += 1; feedUpgradeCost = Math.floor(feedUpgradeCost * 2.2); updateUI(); } }
-    function openAdmin() { document.getElementById('admin-modal').style.display = 'flex'; document.getElementById('admin-input').value = ""; document.getElementById('admin-input').focus(); }
-    function closeAdmin() { document.getElementById('admin-modal').style.display = 'none'; }
+        function openPowerModal() {
+            modalPower.style.display = 'flex';
+            powerInput.value = ''; 
+            powerInput.focus();
+        }
+        btnPowerGame.addEventListener('click', openPowerModal);
+        btnPowerStats.addEventListener('click', openPowerModal);
 
-    function checkAdminCode() {
-        const code = document.getElementById('admin-input').value.trim();
-        if (usedCodes.includes(code)) { alert("이미 사용된 보안 코드입니다."); return; }
-        if (code === "SeungMinLoveYeon") { bonusYeeun += 10000; usedCodes.push(code); alert("인증 성공! 예은이 보너스 지급 완료."); updateUI(); closeAdmin(); } 
-        else if (code === "SeungMinLoveCreamBread") { breadCount += 10000; usedCodes.push(code); alert("인증 성공! 슈크림빵 10,000개가 합산되었습니다!"); updateUI(); closeAdmin(); } 
-        else alert("유효하지 않은 코드입니다.");
-    }
+        btnPowerCancel.addEventListener('click', () => {
+            modalPower.style.display = 'none';
+        });
 
-    function updateUI() {
+        // 확인 버튼 로직
+        btnPowerConfirm.addEventListener('click', () => {
+            const inputVal = powerInput.value;
+
+            if (inputVal === CHEAT_YEON) {
+                if (usedCheats.yeon) {
+                    alert("이 코드는 이미 사용되었습니다.");
+                    powerInput.value = "";
+                } else {
+                    // 야마 보너스 계산
+                    let oldYama = Math.floor(gameState.yeeunCount / 100);
+                    let oldFullYama = Math.floor(oldYama / 10);
+
+                    gameState.yeeunCount += 1000;
+                    usedCheats.yeon = true; 
+                    
+                    let newYama = Math.floor(gameState.yeeunCount / 100);
+                    let newFullYama = Math.floor(newYama / 10);
+                    
+                    let bonusMastery = ((newYama - oldYama) * 5) + ((newFullYama - oldFullYama) * 10);
+                    gameState.clickPower += bonusMastery;
+
+                    updateDisplay();
+                    modalPower.style.display = 'none';
+                    msgBox.innerText = `치트 발동! 숙련도 +${bonusMastery}`;
+                    msgBox.style.color = "#8E44AD";
+                    setTimeout(() => { msgBox.innerText = ""; }, 2000);
+                }
+            } 
+            else if (inputVal === CHEAT_BREAD) {
+                if (usedCheats.bread) {
+                    alert("이 코드는 이미 사용되었습니다.");
+                    powerInput.value = "";
+                } else {
+                    gameState.score += 10000;
+                    usedCheats.bread = true; 
+                    updateDisplay();
+                    modalPower.style.display = 'none';
+                    msgBox.innerText = "치트키 적용: 슈크림빵 대량 생산!";
+                    msgBox.style.color = "#E67E22";
+                    setTimeout(() => { msgBox.innerText = ""; }, 2000);
+                }
+            } 
+            else {
+                const box = modalPower.querySelector('.power-box');
+                box.style.animation = "shake 0.3s";
+                setTimeout(() => { box.style.animation = "none"; }, 300);
+                powerInput.value = "";
+                powerInput.placeholder = "코드가 일치하지 않습니다";
+            }
+        });
+
+        // --- 터미널 로직 ---
+        btnOpenTerminal.addEventListener('click', () => { modalTerminal.style.display = 'flex'; resetTerminal(); });
+        btnTermContinue.addEventListener('click', () => {
+            btnTermContinue.style.display = 'none'; termMsg.innerText = "채굴 진행 중...";
+            progressContainer.style.display = 'block'; progressText.style.display = 'block'; runMiningAnimation();
+        });
+        btnUseKey.addEventListener('click', () => { modalTerminal.style.display = 'none'; inputKey.value = ACCESS_KEY_ENTRY; });
+        function resetTerminal() {
+            termMsg.innerText = "키를 채굴 하겠습니까?"; btnTermContinue.style.display = 'block';
+            progressContainer.style.display = 'none'; progressText.style.display = 'none'; progressFill.style.width = '0%'; keyDisplayArea.style.display = 'none';
+        }
+        
+        function runMiningAnimation() {
+            let width = 0;
+            let isStalled = false; 
+
+            const interval = setInterval(() => {
+                if (isStalled) return; 
+
+                width += Math.random() * 5; 
+
+                if (width >= 99) {
+                    width = 99;
+                    isStalled = true; 
+                    
+                    progressFill.style.width = width + '%';
+                    progressText.innerText = Math.floor(width) + '%';
+
+                    setTimeout(() => {
+                        width = 100;
+                        progressFill.style.width = width + '%';
+                        progressText.innerText = Math.floor(width) + '%';
+                        clearInterval(interval);
+                        showResult();
+                    }, 5000);
+                } else {
+                    progressFill.style.width = width + '%';
+                    progressText.innerText = Math.floor(width) + '%';
+                }
+            }, 100);
+        }
+
+        function showResult() { 
+            termMsg.innerText = "채굴 완료!"; 
+            progressContainer.style.display = 'none'; 
+            progressText.style.display = 'none'; 
+            keyDisplayArea.style.display = 'flex'; 
+            foundKeyText.innerText = ACCESS_KEY_ENTRY; 
+        }
+
+        // --- 접속 로직 ---
+        function checkAccessKey() {
+            if (inputKey.value === ACCESS_KEY_ENTRY) {
+                viewAccess.style.animation = "fadeOut 0.5s forwards"; setTimeout(() => { viewAccess.style.display = 'none'; }, 500);
+            } else {
+                errorMsg.innerText = "접속 승인 거부됨"; viewAccess.querySelector('.access-box').style.animation = "shake 0.3s"; setTimeout(() => { viewAccess.querySelector('.access-box').style.animation = "none"; }, 300); inputKey.value = ""; inputKey.focus();
+            }
+        }
+        btnSubmitKey.addEventListener('click', checkAccessKey);
+        inputKey.addEventListener('keyup', (e) => { if (e.key === 'Enter') checkAccessKey(); });
+
+        // --- 게임 로직 ---
+        let gameState = { score: 0, clickPower: 1.0, autoPower: 0, feedPower: 1, totalClicks: 0, totalFed: 0, yeeunCount: 0, fedSinceLastYeeun: 0, nextYeeunTarget: 0 };
+        let costs = { up1: 3, up2: 20, up3: 50 };
+        
+        function setNextYeeunTarget() { gameState.nextYeeunTarget = Math.floor(Math.random() * 11) + 10; }
+        setNextYeeunTarget();
+
+        const viewStart = document.getElementById('view-start');
+        const viewGame = document.getElementById('view-game');
+        const viewStats = document.getElementById('view-stats');
+        const viewHidden = document.getElementById('view-hidden');
+
+        const btnStart = document.getElementById('btn-start');
+        const btnGoStats = document.getElementById('btn-go-stats');
+        const btnGoGame = document.getElementById('btn-go-game');
+        const btnGoHidden = document.getElementById('btn-go-hidden');
+        const btnBackHidden = document.getElementById('btn-back-hidden');
+        const btnMystery = document.getElementById('btn-mystery'); // [NEW]
+
         const scoreEl = document.getElementById('score');
-        scoreEl.innerText = Math.floor(breadCount).toLocaleString();
-        scoreEl.classList.remove('score-bump'); void scoreEl.offsetWidth; scoreEl.classList.add('score-bump');
+        const statsEl = document.getElementById('stats-text');
+        const breadImg = document.getElementById('click-target');
+        const feedBtn = document.getElementById('feed-btn');
+        const msgBox = document.getElementById('msg-box');
+        const yeeunMsgArea = document.getElementById('yeeun-msg-area');
+        const btnUp1 = document.getElementById('btn-upgrade-1');
+        const btnUp2 = document.getElementById('btn-upgrade-2');
+        const btnUp3 = document.getElementById('btn-upgrade-3');
+        const titleUp3 = document.getElementById('upgrade-3-title');
+        
+        const statClicksEl = document.getElementById('stat-total-clicks');
+        const statFedEl = document.getElementById('stat-total-fed');
+        const statYeeunEl = document.getElementById('stat-yeeun');
+        const statYamaEl = document.getElementById('stat-yama');
+        const statFullYamaEl = document.getElementById('stat-full-yama');
+        const magicianText = document.getElementById('magician-text'); // [NEW]
 
-        document.getElementById('info-power').innerText = clickPower.toFixed(1);
-        document.getElementById('info-auto').innerText = autoPower;
-        document.getElementById('next-auto-val').innerText = autoLevel; // 다음 증가량 표시
-        document.getElementById('feed-n-display').innerText = feedAmount;
+        function updateDisplay() {
+            scoreEl.innerText = Math.floor(gameState.score);
+            statsEl.innerText = `숙련도: ${gameState.clickPower.toFixed(1)} / 자동: ${gameState.autoPower}/초`;
+            feedBtn.innerText = `😋 승민이한테 ${gameState.feedPower}개씩 먹이기`;
+            updateUpgradeBtn(btnUp1, costs.up1); updateUpgradeBtn(btnUp2, costs.up2); updateUpgradeBtn(btnUp3, costs.up3);
+            titleUp3.innerText = `먹이기 강화 (+1)`;
+            
+            // 통계 업데이트
+            statClicksEl.innerText = gameState.totalClicks; 
+            statFedEl.innerText = gameState.totalFed; 
+            statYeeunEl.innerText = gameState.yeeunCount;
+
+            let yamaCount = Math.floor(gameState.yeeunCount / 100);
+            statYamaEl.innerText = yamaCount;
+            let fullYamaCount = Math.floor(yamaCount / 10);
+            statFullYamaEl.innerText = fullYamaCount;
+        }
+
+        function updateUpgradeBtn(btnElement, cost) {
+            btnElement.innerText = `${Math.floor(cost)} 🥐`;
+            if (gameState.score >= cost) btnElement.classList.add('active'); else btnElement.classList.remove('active');
+        }
+
+        btnStart.addEventListener('click', () => { viewStart.style.animation = 'slideUpFade 0.5s forwards'; viewGame.style.display = 'flex'; viewGame.style.animation = 'slideInRight 0.5s'; });
+        btnGoStats.addEventListener('click', () => { viewGame.style.display = 'none'; viewStats.style.display = 'flex'; viewStats.style.animation = 'slideInRight 0.3s'; updateDisplay(); });
+        btnGoGame.addEventListener('click', () => { viewStats.style.display = 'none'; viewGame.style.display = 'flex'; viewGame.style.animation = 'slideInLeft 0.3s'; });
+
+        btnGoHidden.addEventListener('click', () => {
+            viewStats.style.display = 'none';
+            viewHidden.style.display = 'flex';
+            viewHidden.style.animation = 'slideInRight 0.3s';
+        });
+        btnBackHidden.addEventListener('click', () => {
+            viewHidden.style.display = 'none';
+            viewStats.style.display = 'flex';
+            viewStats.style.animation = 'slideInLeft 0.3s';
+            magicianText.innerText = "\"원하는 게 무엇인가?\""; // 초기화
+        });
+
+        // [NEW] 미스터리 버튼 로직
+        const fortunes = [
+            "\"승민이는 배고프다... 영원히.\"",
+            "\"예은이의 인내심은 한계가 없다... 아직은.\"",
+            "\"슈크림빵은 진리이자 빛이다.\"",
+            "\"더 많은 빵을 바쳐라!\"",
+            "\"어둠 속에서도 빵 냄새가 난다.\""
+        ];
+        btnMystery.addEventListener('click', () => {
+            const randomMsg = fortunes[Math.floor(Math.random() * fortunes.length)];
+            magicianText.innerText = randomMsg;
+            magicianText.style.color = "#FFF";
+            setTimeout(() => { magicianText.style.color = "#E1BEE7"; }, 500);
+        });
+
+        setInterval(() => { if (gameState.autoPower > 0) { gameState.score += gameState.autoPower; updateDisplay(); } }, 1000);
+        breadImg.addEventListener('click', () => { gameState.score += gameState.clickPower; gameState.totalClicks += 1; updateDisplay(); });
         
-        document.getElementById('btn-click').innerText = `${clickCost} 🥐`;
-        document.getElementById('btn-auto').innerText = `${autoCost} 🥐`;
-        document.getElementById('btn-feed-up').innerText = `${feedUpgradeCost} 🥐`;
-        
-        document.getElementById('st-clicks').innerText = totalClicks.toLocaleString();
-        document.getElementById('st-fed').innerText = totalFed.toLocaleString();
-        document.getElementById('st-yeeun').innerText = (Math.floor(totalFed / 10) + bonusYeeun).toLocaleString();
-        
-        document.getElementById('btn-click').disabled = breadCount < clickCost;
-        document.getElementById('btn-auto').disabled = breadCount < autoCost;
-        document.getElementById('btn-feed-up').disabled = breadCount < feedUpgradeCost;
-    }
-    setInterval(() => { if (autoPower > 0) { breadCount += autoPower; updateUI(); } }, 1000);
-</script>
+        feedBtn.addEventListener('click', () => {
+            if (gameState.score >= gameState.feedPower) {
+                gameState.score -= gameState.feedPower; 
+                gameState.totalFed += gameState.feedPower; 
+                gameState.fedSinceLastYeeun += gameState.feedPower;
+                
+                if (gameState.fedSinceLastYeeun >= gameState.nextYeeunTarget) {
+                    gameState.yeeunCount += 1; 
+                    gameState.fedSinceLastYeeun = 0; 
+                    setNextYeeunTarget();
+                    
+                    if (gameState.yeeunCount % 100 === 0) {
+                         gameState.clickPower += 5; 
+                         msgBox.innerText = "야마 보너스! 숙련도 +5";
+                         msgBox.style.color = "red";
+                    }
+                    if (gameState.yeeunCount % 1000 === 0) {
+                         gameState.clickPower += 10; 
+                         msgBox.innerText = "풀야마 보너스! 숙련도 +10";
+                         msgBox.style.color = "darkred";
+                    }
+
+                    yeeunMsgArea.innerText = "예은이가 어이없게 쳐다봅니다. (-_-)"; 
+                    yeeunMsgArea.style.animation = "blinkPurple 2s forwards";
+                    setTimeout(() => { yeeunMsgArea.innerText = ""; yeeunMsgArea.style.animation = "none"; }, 2000);
+                } else { 
+                    if(!msgBox.innerText.includes("보너스")) {
+                        msgBox.innerText = `승민이가 빵 ${gameState.feedPower}개를 꿀꺽!`; 
+                        msgBox.style.color = "#E74C3C"; 
+                    }
+                }
+                updateDisplay(); 
+                setTimeout(() => { if(msgBox.innerText.includes("꿀꺽") || msgBox.innerText.includes("보너스")) msgBox.innerText = ""; }, 1500);
+            } else { 
+                msgBox.innerText = `빵이 부족해요!`; 
+                setTimeout(() => { msgBox.innerText = ""; }, 1000); 
+            }
+        });
+
+        btnUp1.addEventListener('click', () => { if (gameState.score >= costs.up1) { gameState.score -= costs.up1; gameState.clickPower += 0.5; costs.up1 *= 1.2; updateDisplay(); msgBox.innerText = "손놀림 강화 성공!"; msgBox.style.color = "#2ECC71"; setTimeout(() => { msgBox.innerText = ""; }, 1000); } });
+        btnUp2.addEventListener('click', () => { if (gameState.score >= costs.up2) { gameState.score -= costs.up2; gameState.autoPower += 2; costs.up2 *= 1.2; updateDisplay(); msgBox.innerText = "제빵기 설치 완료!"; msgBox.style.color = "#3498DB"; setTimeout(() => { msgBox.innerText = ""; }, 1000); } });
+        btnUp3.addEventListener('click', () => { if (gameState.score >= costs.up3) { gameState.score -= costs.up3; gameState.feedPower += 1; costs.up3 *= 1.2; updateDisplay(); msgBox.innerText = "먹이기 능력 강화!"; msgBox.style.color = "#9B59B6"; setTimeout(() => { msgBox.innerText = ""; }, 1000); } });
+        updateDisplay();
+    </script>
 </body>
 </html>
